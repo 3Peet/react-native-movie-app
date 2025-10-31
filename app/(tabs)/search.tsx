@@ -3,6 +3,7 @@ import SearchBar from "@/components/searh-bar";
 import { icons } from "@/constants/icons";
 import { images } from "@/constants/images";
 import { fetchPopularMovies } from "@/services/api";
+import { updateSearchCount } from "@/services/app-write";
 import useFetch from "@/services/use-fetch";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, FlatList, Image, Text, View } from "react-native";
@@ -30,6 +31,13 @@ const Search = () => {
 		return () => clearTimeout(timeoutId);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [searchQuery]);
+
+	// biome-ignore lint/correctness/useExhaustiveDependencies: ''
+	useEffect(() => {
+		if (movies?.length > 0 && movies?.[0]) {
+			updateSearchCount(searchQuery, movies[0]);
+		}
+	}, [movies]);
 	return (
 		<View className="flex-1 bg-primary">
 			<Image

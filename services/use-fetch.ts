@@ -27,7 +27,7 @@ const useFetch = <T>(fetchFn: () => Promise<T>, autoFetch = true) => {
 		setError(null);
 	};
 
-	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+	// biome-ignore lint/correctness/useExhaustiveDependencies: </>
 	useEffect(() => {
 		if (autoFetch) {
 			fetchData();

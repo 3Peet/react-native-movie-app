@@ -1,8 +1,10 @@
 import MovieCard from "@/components/movie-card";
 import SearchBar from "@/components/searh-bar";
+import TrendingCard from "@/components/trending-card";
 import { icons } from "@/constants/icons";
 import { images } from "@/constants/images";
 import { fetchPopularMovies } from "@/services/api";
+import { getTrendingMovies } from "@/services/app-write";
 import useFetch from "@/services/use-fetch";
 import { useRouter } from "expo-router";
 import {
@@ -21,6 +23,15 @@ export default function Home() {
 		loading: moviesLoading,
 		error: moviesError,
 	} = useFetch(() => fetchPopularMovies({ query: "" }));
+
+	const {
+		data: trendingMovies,
+		loading: trendingMoviesLoading,
+		error: trendingMoviesError,
+	} = useFetch(getTrendingMovies);
+
+	const isLoading = moviesLoading || trendingMoviesLoading;
+	const error = moviesError || trendingMoviesError;
 	return (
 		<View className="flex-1 bg-primary">
 			<Image source={images.bg} className="absolute z-0 w-full" />
@@ -30,21 +41,38 @@ export default function Home() {
 				contentContainerStyle={{ minHeight: "100%", paddingBottom: 10 }}
 			>
 				<Image source={icons.logo} className="mx-auto mt-20 mb-5 h-10 w-12" />
-				{moviesLoading ? (
+				{isLoading ? (
 					<ActivityIndicator
 						size="large"
 						color="#0000ff"
 						className="mt-10 self-center"
 					/>
-				) : moviesError ? (
-					<Text>Error: {moviesError?.message}</Text>
+				) : error ? (
+					<Text>Error: {error?.message}</Text>
 				) : (
 					<View className="mt-5 flex-1">
 						<SearchBar
 							onPress={() => router.push("/search")}
 							placeholder="Search for movies..."
 						/>
-
+						{trendingMovies && (
+							<View className="mt-10">
+								<Text className="mt-5 mb-3 font-bold text-lg text-white">
+									Trending Movies
+								</Text>
+								<FlatList
+									horizontal
+									showsHorizontalScrollIndicator={false}
+									ItemSeparatorComponent={() => <View className="w-4" />}
+									className="mt-3 mb-4"
+									data={trendingMovies}
+									renderItem={({ item, index }) => (
+										<TrendingCard movie={item} index={index} />
+									)}
+									keyExtractor={(item) => item.movie_id.toString()}
+								/>
+							</View>
+						)}
 						<Text className="mt-5 mb-3 font-bold text-lg text-white">
 							Latest Movies
 						</Text>
